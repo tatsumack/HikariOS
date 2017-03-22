@@ -2,6 +2,6 @@
 
 void HariMain(void)
 {
-	api_putchar('A');
-	api_end();
+    api_putchar('A');
+    api_end();
 }
