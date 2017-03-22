@@ -1,8 +1,6 @@
 ; haribote-os boot asm
 ; TAB=4
 
-[INSTRSET "i486p"]
-
 VBEMODE    EQU        0x105            ; 1024 x  768 x 8bitカラー
 ; （画面モード一覧）
 ;    0x100 :  640 x  400 x 8bitカラー
@@ -71,7 +69,7 @@ VRAM    EQU        0x0ff8            ; グラフィックバッファの開始番地
         MOV        [SCRNY],AX
         MOV        EAX,[ES:DI+0x28]
         MOV        [VRAM],EAX
-        JMP        keystatus
+        JMP SHORT  keystatus
 
 scrn320:
         MOV        AL,0x13            ; VGAグラフィックス、320x200x8bitカラー
@@ -118,7 +116,7 @@ keystatus:
         AND        EAX,0x7fffffff    ; bit31を0にする（ページング禁止のため）
         OR        EAX,0x00000001    ; bit0を1にする（プロテクトモード移行のため）
         MOV        CR0,EAX
-        JMP        pipelineflush
+        JMP SHORT  pipelineflush
 pipelineflush:
         MOV        AX,1*8            ;  読み書き可能セグメント32bit
         MOV        DS,AX
@@ -188,9 +186,9 @@ memcpy:
         RET
 ; memcpyはアドレスサイズプリフィクスを入れ忘れなければ、ストリング命令でも書ける
 
-        ALIGNB    16
+        ALIGN 16, DB 0
 GDT0:
-        RESB    8                ; ヌルセレクタ
+        TIMES 8 DB 0                 ; ヌルセレクタ
         DW        0xffff,0x0000,0x9200,0x00cf    ; 読み書き可能セグメント32bit
         DW        0xffff,0x0000,0x9a28,0x0047    ; 実行可能セグメント32bit（bootpack用）
 
@@ -199,5 +197,5 @@ GDTR0:
         DW        8*3-1
         DD        GDT0
 
-        ALIGNB    16
+        ALIGN 16, DB 0
 bootpack:

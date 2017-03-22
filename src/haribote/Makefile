@@ -7,6 +7,7 @@ INCPATH  = ../../z_tools/haribote/
 
 MAKE     = make -r
 NASK     = $(TOOLPATH)nask
+NASM     = nasm
 CC1      = $(TOOLPATH)gocc1 -I$(INCPATH) -Os -Wall -quiet
 GAS2NASK = $(TOOLPATH)gas2nask -a
 OBJ2BIM  = $(TOOLPATH)obj2bim
@@ -29,10 +30,13 @@ default :
 # ÉtÉ@ÉCÉãê∂ê¨ãKë•
 
 ipl09.bin : ipl09.nas Makefile
-	$(NASK) ipl09.nas ipl09.bin ipl09.lst
+	$(NASM) ipl09.nas -o ipl09.bin -l ipl09.lst
 
 asmhead.bin : asmhead.nas Makefile
-	$(NASK) asmhead.nas asmhead.bin asmhead.lst
+	$(NASM) asmhead.nas -o asmhead.bin -l asmhead.lst
+
+naskfunc.obj : naskfunc.nas Makefile
+	$(NASM) -fwin32 naskfunc.nas -o naskfunc.obj -l naskfunc.lst
 
 hankaku.bin : hankaku.txt Makefile
 	$(MAKEFONT) hankaku.txt hankaku.bin

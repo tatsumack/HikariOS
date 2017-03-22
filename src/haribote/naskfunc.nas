@@ -1,10 +1,7 @@
 ; naskfunc
 ; TAB=4
 
-[FORMAT "WCOFF"]                ; オブジェクトファイルを作るモード    
-[INSTRSET "i486p"]                ; 486の命令まで使いたいという記述
 [BITS 32]                        ; 32ビットモード用の機械語を作らせる
-[FILE "naskfunc.nas"]            ; ソースファイル名情報
 
         GLOBAL    _io_hlt, _io_cli, _io_sti, _io_stihlt
         GLOBAL    _io_in8,  _io_in16,  _io_in32
@@ -174,7 +171,7 @@ _asm_inthandler0c:
         MOV        ES,AX
         CALL    _inthandler0c
         CMP        EAX,0
-        JNE        _asm_end_app
+        JNE NEAR   _asm_end_app
         POP        EAX
         POPAD
         POP        DS

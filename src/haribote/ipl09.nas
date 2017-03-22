@@ -7,7 +7,7 @@ CYLS    EQU        9                ; どこまで読み込むか
 
 ; 以下は標準的なFAT12フォーマットフロッピーディスクのための記述
 
-        JMP        entry
+        JMP SHORT entry
         DB        0x90
         DB        "HARIBOTE"        ; ブートセクタの名前を自由に書いてよい（8バイト）
         DW        512                ; 1セクタの大きさ（512にしなければいけない）
@@ -26,7 +26,7 @@ CYLS    EQU        9                ; どこまで読み込むか
         DD        0xffffffff        ; たぶんボリュームシリアル番号
         DB        "HARIBOTEOS "    ; ディスクの名前（11バイト）
         DB        "FAT12   "        ; フォーマットの名前（8バイト）
-        RESB    18                ; とりあえず18バイトあけておく
+        TIMES 18 DB 0                ; とりあえず18バイトあけておく
 
 ; プログラム本体
 
@@ -148,6 +148,6 @@ next:
 .ret:
         RET
 
-        RESB    0x7dfe-$        ; 0x7dfeまでを0x00で埋める命令
+        TIMES 0x1fe-($-$$) DB 0        ; 0x7dfeまでを0x00で埋める命令
 
         DB        0x55, 0xaa
