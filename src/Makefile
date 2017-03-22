@@ -80,6 +80,7 @@ install :
 	$(IMGTOL) w a: haribote.img
 
 full :
+	$(MAKE) -C ../golibc
 	$(MAKE) -C haribote
 	$(MAKE) -C apilib
 	$(MAKE) -C a
@@ -134,6 +135,7 @@ src_only :
 	-$(DEL) haribote.img
 
 clean_full :
+	$(MAKE) -C ../golibc	clean
 	$(MAKE) -C haribote		clean
 	$(MAKE) -C apilib		clean
 	$(MAKE) -C a			clean

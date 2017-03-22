@@ -1,14 +1,17 @@
-OBJS_BOOTPACK = bootpack.obj naskfunc.obj hankaku.obj graphic.obj dsctbl.obj \
-		int.obj fifo.obj keyboard.obj mouse.obj memory.obj sheet.obj timer.obj \
-		mtask.obj window.obj console.obj file.obj tek.obj
+OBJS_BOOTPACK = bootpack.o naskfunc.o hankaku.obj graphic.o dsctbl.o \
+		int.o fifo.o keyboard.o mouse.o memory.o sheet.o timer.o \
+		mtask.o window.o console.o file.o tek.o
 
 TOOLPATH = ../../z_tools/
 INCPATH  = ../../z_tools/haribote/
+LIBPATH  = ../../golibc
 
 MAKE     = make -r
 NASK     = $(TOOLPATH)nask
 NASM     = nasm
 CC1      = $(TOOLPATH)gocc1 -I$(INCPATH) -Os -Wall -quiet
+GCC      = /usr/local/i386elfgcc/bin/i386-elf-gcc
+LD       = /usr/local/i386elfgcc/bin/i386-elf-ld
 GAS2NASK = $(TOOLPATH)gas2nask -a
 OBJ2BIM  = $(TOOLPATH)obj2bim
 MAKEFONT = $(TOOLPATH)makefont
@@ -35,14 +38,14 @@ ipl09.bin : ipl09.nas Makefile
 asmhead.bin : asmhead.nas Makefile
 	$(NASM) asmhead.nas -o asmhead.bin -l asmhead.lst
 
-naskfunc.obj : naskfunc.nas Makefile
-	$(NASM) -fwin32 naskfunc.nas -o naskfunc.obj -l naskfunc.lst
+naskfunc.o : naskfunc.nas Makefile
+	$(NASM) -felf naskfunc.nas -o naskfunc.o -l naskfunc.lst
 
 hankaku.bin : hankaku.txt Makefile
 	$(MAKEFONT) hankaku.txt hankaku.bin
 
 hankaku.obj : hankaku.bin Makefile
-	$(BIN2OBJ) hankaku.bin hankaku.obj _hankaku
+	$(BIN2OBJ) hankaku.bin hankaku.obj hankaku
 
 bootpack.bim : $(OBJS_BOOTPACK) Makefile
 	$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map \
@@ -52,8 +55,11 @@ bootpack.bim : $(OBJS_BOOTPACK) Makefile
 bootpack.hrb : bootpack.bim Makefile
 	$(BIM2HRB) bootpack.bim bootpack.hrb 0
 
-haribote.sys : asmhead.bin bootpack.hrb Makefile
-	cat asmhead.bin bootpack.hrb > haribote.sys
+bootpack.bin : $(OBJS_BOOTPACK) Makefile
+	$(LD) -m elf_i386 -Map bootpack.map -T bootpack.ls -oformat=binary $(OBJS_BOOTPACK) -static -L$(LIBPATH) -lgolibc -o bootpack.bin 
+
+haribote.sys : asmhead.bin bootpack.bin Makefile
+	cat asmhead.bin bootpack.bin > haribote.sys
 
 # ˆê”Ê‹K‘¥
 
@@ -66,6 +72,9 @@ haribote.sys : asmhead.bin bootpack.hrb Makefile
 %.obj : %.nas Makefile
 	$(NASK) $*.nas $*.obj $*.lst
 
+%.o : %.c Makefile
+	$(GCC) -m32 -g -O0 -nostdlib -I$(INCPATH) -c $*.c -o $*.o
+
 # ƒRƒ}ƒ“ƒh
 
 clean :
@@ -73,6 +82,7 @@ clean :
 	-$(DEL) hankaku.bin
 	-$(DEL) *.lst
 	-$(DEL) *.obj
+	-$(DEL) *.o
 	-$(DEL) *.map
 	-$(DEL) *.bim
 	-$(DEL) *.hrb
