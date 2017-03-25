@@ -42,6 +42,7 @@ apilib.lib : Makefile $(OBJS_API)
 clean :
 	-$(DEL) *.lst
 	-$(DEL) *.obj
+	-$(DEL) *.lib
 
 src_only :
 	$(MAKE) clean
