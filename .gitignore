@@ -4,7 +4,6 @@
 *.hrb
 *.lst
 *.map
-*.obj
 *.img
 *.bin
 *.sys
