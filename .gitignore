@@ -8,4 +8,5 @@
 *.img
 *.bin
 *.sys
-*.lib
+*.o
+*.org
