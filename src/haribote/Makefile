@@ -7,20 +7,11 @@ INCPATH  = ../../z_tools/haribote/
 LIBPATH  = ../../golibc
 
 MAKE     = make -r
-NASK     = $(TOOLPATH)nask
 NASM     = nasm
-CC1      = $(TOOLPATH)gocc1 -I$(INCPATH) -Os -Wall -quiet
 GCC      = /usr/local/i386elfgcc/bin/i386-elf-gcc
 LD       = /usr/local/i386elfgcc/bin/i386-elf-ld
-GAS2NASK = $(TOOLPATH)gas2nask -a
-OBJ2BIM  = $(TOOLPATH)obj2bim
 MAKEFONT = $(TOOLPATH)makefont
 BIN2OBJ  = $(TOOLPATH)bin2obj
-BIM2HRB  = $(TOOLPATH)bim2hrb
-RULEFILE = ../haribote.rul
-EDIMG    = $(TOOLPATH)edimg
-IMGTOL   = $(TOOLPATH)imgtol
-GOLIB    = $(TOOLPATH)golib00
 COPY     = cp
 DEL      = rm -f
 
@@ -47,14 +38,6 @@ hankaku.bin : hankaku.txt Makefile
 hankaku.obj : hankaku.bin Makefile
 	$(BIN2OBJ) hankaku.bin hankaku.obj hankaku
 
-bootpack.bim : $(OBJS_BOOTPACK) Makefile
-	$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map \
-		$(OBJS_BOOTPACK)
-# 3MB+64KB=3136KB
-
-bootpack.hrb : bootpack.bim Makefile
-	$(BIM2HRB) bootpack.bim bootpack.hrb 0
-
 bootpack.bin : $(OBJS_BOOTPACK) Makefile
 	$(LD) -m elf_i386 -Map bootpack.map -T bootpack.ls -oformat=binary $(OBJS_BOOTPACK) -static -L$(LIBPATH) -lgolibc -o bootpack.bin 
 
@@ -62,15 +45,6 @@ haribote.sys : asmhead.bin bootpack.bin Makefile
 	cat asmhead.bin bootpack.bin > haribote.sys
 
 # ˆê”Ê‹K‘¥
-
-%.gas : %.c bootpack.h Makefile
-	$(CC1) -o $*.gas $*.c
-
-%.nas : %.gas Makefile
-	$(GAS2NASK) $*.gas $*.nas
-
-%.obj : %.nas Makefile
-	$(NASK) $*.nas $*.obj $*.lst
 
 %.o : %.c Makefile
 	$(GCC) -m32 -g -O0 -nostdlib -I$(INCPATH) -c $*.c -o $*.o
